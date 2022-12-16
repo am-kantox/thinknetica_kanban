@@ -8,8 +8,8 @@ defmodule Kanban.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Kanban.Worker.start_link(arg)
-      # {Kanban.Worker, arg}
+      {Registry, keys: :unique, name: Kanban.TaskRegistry},
+      Kanban.TaskManager
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
