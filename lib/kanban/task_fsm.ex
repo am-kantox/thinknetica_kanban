@@ -5,7 +5,7 @@ defmodule Kanban.TaskFSM do
 
   alias Kanban.Data.Task
 
-  use GenServer
+  use GenServer, restart: :transient
 
   require Logger
 
@@ -27,6 +27,11 @@ defmodule Kanban.TaskFSM do
   end
 
   @impl GenServer
+  def terminate(:normal, task) do
+    Kanban.State.del(task.title)
+  end
+
+  @impl GenServer
   def init(state), do: {:ok, state}
 
   @impl GenServer
@@ -36,12 +41,14 @@ defmodule Kanban.TaskFSM do
     #   :error -> task
     # end
     # new_task = {:noreply, new_task}
+    Kanban.State.put(task.title, "doing")
     {:noreply, %Task{task | state: "doing"}}
   end
 
   @impl GenServer
   def handle_cast({:transition, :finish}, %Task{state: "doing"} = task) do
     # Save to external storage
+    Kanban.State.put(task.title, "done")
     {:stop, :normal, %Task{task | state: "done"}}
   end
 

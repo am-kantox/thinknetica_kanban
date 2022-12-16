@@ -21,8 +21,12 @@ defmodule Kanban.TaskManager do
     Kanban.TaskManager
     |> DynamicSupervisor.start_child({Kanban.TaskFSM, task: task})
     |> case do
-      {:ok, pid} -> pid
-      {:error, {:already_started, pid}} -> pid
+      {:ok, pid} ->
+        Kanban.State.put(task.title, task.state)
+        pid
+
+      {:error, {:already_started, pid}} ->
+        pid
     end
   end
 

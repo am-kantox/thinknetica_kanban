@@ -3,21 +3,17 @@ defmodule Kanban do
   Documentation for `Kanban`.
   """
 
-  @doc """
-  Hello world.
+  def start_task(task_id) do
+    Kanban.TaskFSM.start({:via, Registry, {Kanban.TaskRegistry, task_id}})
+  end
 
-  ## Examples
+  def finish_task(task_id) do
+    Kanban.TaskFSM.finish({:via, Registry, {Kanban.TaskRegistry, task_id}})
+  end
 
-      iex> Kanban.hello(true)
-      :world
-      iex> Kanban.hello(false)
-      :sun
-
-  """
-  def hello(arg) do
-    case arg do
-      true -> :world
-      false -> :sun
-    end
+  def query_task(task_id) do
+    # if Process.alive?({:via, Registry, {Kanban.TaskRegistry, task_id}}) do
+    Kanban.TaskFSM.state({:via, Registry, {Kanban.TaskRegistry, task_id}})
+    # end
   end
 end
